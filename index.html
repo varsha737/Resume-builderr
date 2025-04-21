@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume Builder</title>
+  <style>
+    #resume builder{ color:brown;}
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    form, #resumePreview { max-width: 600px; margin: auto; }
+    input, textarea { width: 100%; margin: 10px 0; padding: 8px; }
+    button { padding: 10px 15px; cursor: pointer; }
+    #resumePreview { border: 1px solid #ccc; padding: 20px; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <h2>Resume Builder</h2>
+  <form id="resumeForm">
+    <input type="text" id="name" placeholder="Full Name" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="text" id="phone" placeholder="Phone Number" required />
+    <textarea id="education" placeholder="Education (e.g. BSc in CS from XYZ University)"></textarea>
+    <textarea id="skills" placeholder="Skills (comma-separated)"></textarea>
+    <textarea id="experience" placeholder="Experience (e.g. Intern at ABC Corp)"></textarea>
+    <button type="submit">Generate Resume</button>
+  </form>
+
+  <div id="resumePreview" style="display:none;">
+    <h2 id="displayName"></h2>
+    <p id="displayEmail"></p>
+    <p id="displayPhone"></p>
+    <h3>Education</h3>
+    <p id="displayEducation"></p>
+    <h3>Skills</h3>
+    <ul id="displaySkills"></ul>
+    <h3>Experience</h3>
+    <p id="displayExperience"></p>
+    <button onclick="downloadPDF()">Download as PDF</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    const form = document.getElementById("resumeForm");
+    const preview = document.getElementById("resumePreview");
+
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      document.getElementById("displayName").innerText = document.getElementById("name").value;
+      document.getElementById("displayEmail").innerText = document.getElementById("email").value;
+      document.getElementById("displayPhone").innerText = document.getElementById("phone").value;
+      document.getElementById("displayEducation").innerText = document.getElementById("education").value;
+      document.getElementById("displayExperience").innerText = document.getElementById("experience").value;
+
+      const skills = document.getElementById("skills").value.split(',');
+      const skillsList = document.getElementById("displaySkills");
+      skillsList.innerHTML = "";
+      skills.forEach(skill => {
+        if (skill.trim() !== "") {
+          const li = document.createElement("li");
+          li.innerText = skill.trim();
+          skillsList.appendChild(li);
+        }
+      });
+
+      preview.style.display = "block";
+    };
+
+    function downloadPDF() {
+      const {{ jsPDF }} = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Name: " + document.getElementById("displayName").innerText, 10, 10);
+      doc.text("Email: " + document.getElementById("displayEmail").innerText, 10, 20);
+      doc.text("Phone: " + document.getElementById("displayPhone").innerText, 10, 30);
+      doc.text("Education: " + document.getElementById("displayEducation").innerText, 10, 40);
+      doc.text("Skills: " + Array.from(document.getElementById("displaySkills").children).map(li => li.innerText).join(", "), 10, 50);
+      doc.text("Experience: " + document.getElementById("displayExperience").innerText, 10, 60);
+      doc.save("resume.pdf");
+    }
+  </script>
+</body>
+</html>
